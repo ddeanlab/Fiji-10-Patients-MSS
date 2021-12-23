@@ -1,0 +1,166 @@
+---
+title: "Pathway Statistics"
+author: "Gracie Richards"
+date: "10/24/2021"
+output: html_document
+---
+
+```{r}
+library(dplyr)
+library(readr)
+library(tidyr)
+library(stringr)
+```
+
+```{r}
+df <- read_csv("Downloads/pathabundance_relab.csv")
+df <- df %>% rename(Pathway = "# Pathway")
+dfVR <- df %>% select(-`107C_Abundance`, -`121C_Abundance`, -`192C_Abundance`, -`30C_Abundance`, -`319C_Abundance`, -`35C_Abundance`, -`362C_Abundance`, -`57C_Abundance`, -`72C_Abundance`, -`98C_Abundance`)
+```
+
+```{r}
+for (path in dfVR$Pathway) {
+  write(path, file = "Wilcoxon_results_all_V>R.txt", append = TRUE)
+  one_row <- dfVR %>% filter(Pathway == path)
+  Vdf <- one_row %>% select(contains("V"))
+  Rdf <- one_row %>% select(contains("R"))
+  V <- as.numeric(Vdf[1,])
+  R <- as.numeric(Rdf[1,])
+  write(paste("Mean of vaginal samples:", mean(V), sep = " "), file = "Wilcoxon_results_all_V>R.txt", append = TRUE)
+  write(paste("Mean of rectal samples:", mean(R), sep = " "), file = "Wilcoxon_results_all_V>R.txt", append = TRUE)
+  results <- wilcox.test(V, R, exact=FALSE, alternative="greater")
+  write(results$method, file = "Wilcoxon_results_all_V>R.txt", append = TRUE)
+  write(results$p.value, file = "Wilcoxon_results_all_V>R.txt", append = TRUE)
+  write("", file = "Wilcoxon_results_all_V>R.txt", append = TRUE)
+  if (results$p.value < 0.05) {
+    write(path, file = "V_significantly_greater_than_R.txt", append = TRUE)
+    write(paste("Mean of vaginal samples:", mean(V), sep = " "), file = "V_significantly_greater_than_R.txt", append = TRUE)
+    write(paste("Mean of rectal samples:", mean(R), sep = " "), file = "V_significantly_greater_than_R.txt", append = TRUE)
+    write(results$method, file = "V_significantly_greater_than_R.txt", append = TRUE)
+    write(results$p.value, file = "V_significantly_greater_than_R.txt", append = TRUE)
+    write("", file = "V_significantly_greater_than_R.txt", append = TRUE)
+  }
+}
+```
+
+```{r}
+for (path in df$Pathway) {
+  write(path, file = "Wilcoxon_results_all_C>R.txt", append = TRUE)
+  one_row <- df %>% filter(Pathway == path)
+  Cdf <- one_row %>% select(contains("C"))
+  Rdf <- one_row %>% select(contains("R"))
+  C <- as.numeric(Cdf[1,])
+  R <- as.numeric(Rdf[1,])
+  write(paste("Mean of endocervical samples:", mean(C), sep = " "), file = "Wilcoxon_results_all_C>R.txt", append = TRUE)
+  write(paste("Mean of rectal samples:", mean(R), sep = " "), file = "Wilcoxon_results_all_C>R.txt", append = TRUE)
+  results <- wilcox.test(C, R, exact=FALSE, alternative="greater")
+  write(results$method, file = "Wilcoxon_results_all_C>R.txt", append = TRUE)
+  write(results$p.value, file = "Wilcoxon_results_all_C>R.txt", append = TRUE)
+  write("", file = "Wilcoxon_results_all_C>R.txt", append = TRUE)
+  if (results$p.value < 0.05) {
+    write(path, file = "C_significantly_greater_than_R.txt", append = TRUE)
+    write(paste("Mean of endocervical samples:", mean(C), sep = " "), file = "C_significantly_greater_than_R.txt", append = TRUE)
+    write(paste("Mean of rectal samples:", mean(R), sep = " "), file = "C_significantly_greater_than_R.txt", append = TRUE)
+    write(results$method, file = "C_significantly_greater_than_R.txt", append = TRUE)
+    write(results$p.value, file = "C_significantly_greater_than_R.txt", append = TRUE)
+    write("", file = "C_significantly_greater_than_R.txt", append = TRUE)
+  }
+}
+```
+
+```{r}
+for (path in df$Pathway) {
+  write(path, file = "Wilcoxon_results_all_V>C.txt", append = TRUE)
+  one_row <- df %>% filter(Pathway == path)
+  Vdf <- one_row %>% select(contains("V"))
+  Cdf <- one_row %>% select(contains("C"))
+  V <- as.numeric(Vdf[1,])
+  C <- as.numeric(Cdf[1,])
+  write(paste("Mean of vaginal samples:", mean(V), sep = " "), file = "Wilcoxon_results_all_V>C.txt", append = TRUE)
+  write(paste("Mean of endocervical samples:", mean(C), sep = " "), file = "Wilcoxon_results_all_V>C.txt", append = TRUE)
+  results <- wilcox.test(V, C, exact=FALSE, alternative="greater")
+  write(results$method, file = "Wilcoxon_results_all_V>C.txt", append = TRUE)
+  write(results$p.value, file = "Wilcoxon_results_all_V>C.txt", append = TRUE)
+  write("", file = "Wilcoxon_results_all_V>C.txt", append = TRUE)
+  if (results$p.value < 0.05) {
+    write(path, file = "V_significantly_greater_than_C.txt", append = TRUE)
+    write(paste("Mean of vaginal samples:", mean(V), sep = " "), file = "V_significantly_greater_than_C.txt", append = TRUE)
+    write(paste("Mean of endocervical samples:", mean(C), sep = " "), file = "V_significantly_greater_than_C.txt", append = TRUE)
+    write(results$method, file = "V_significantly_greater_than_C.txt", append = TRUE)
+    write(results$p.value, file = "V_significantly_greater_than_C.txt", append = TRUE)
+    write("", file = "V_significantly_greater_than_C.txt", append = TRUE)
+  }
+}
+```
+
+```{r}
+neg <- read_csv("Downloads/ct_negative.csv")
+pos <- read_csv("Downloads/ct_positive.csv")
+neg <- neg %>% rename(Pathway = "# Pathway")
+pos <- pos %>% rename(Pathway = "# Pathway")
+for (path in df$Pathway) {
+  write(path, file = "Wilcoxon_results_all_V_ctpos.txt", append = TRUE)
+  write(path, file = "Wilcoxon_results_all_C_ctpos.txt", append = TRUE)
+  write(path, file = "Wilcoxon_results_all_R_ctpos.txt", append = TRUE)
+  one_row_neg <- neg %>% filter(Pathway == path)
+  one_row_pos <- pos %>% filter(Pathway == path)
+  negV <- one_row_neg %>% select(contains("V"))
+  posV <- one_row_pos %>% select(contains("V"))
+  negC <- one_row_neg %>% select(contains("C"))
+  posC <- one_row_pos %>% select(contains("C"))
+  negR <- one_row_neg %>% select(contains("R"))
+  posR <- one_row_pos %>% select(contains("R"))
+  negV <- as.numeric(negV[1,])
+  posV <- as.numeric(posV[1,]) 
+  negC <- as.numeric(negC[1,])
+  posC <- as.numeric(posC[1,])
+  negR <- as.numeric(negR[1,])
+  posR <- as.numeric(posR[1,])
+  write(paste("Mean of negative V samples:", mean(negV), sep = " "), file = "Wilcoxon_results_all_V_ctpos.txt", append = TRUE)
+  write(paste("Mean of positive V samples:", mean(posV), sep = " "), file = "Wilcoxon_results_all_V_ctpos.txt", append = TRUE)
+  write(paste("Mean of negative C samples:", mean(negC), sep = " "), file = "Wilcoxon_results_all_C_ctpos.txt", append = TRUE)
+  write(paste("Mean of positive C samples:", mean(posC), sep = " "), file = "Wilcoxon_results_all_C_ctpos.txt", append = TRUE)
+  write(paste("Mean of negative R samples:", mean(negR), sep = " "), file = "Wilcoxon_results_all_R_ctpos.txt", append = TRUE)
+  write(paste("Mean of positive R samples:", mean(posR), sep = " "), file = "Wilcoxon_results_all_R_ctpos.txt", append = TRUE)
+  
+  results <- wilcox.test(posV, negV, exact=FALSE, alternative="greater")
+  write(results$method, file = "Wilcoxon_results_all_V_ctpos.txt", append = TRUE)
+  write(results$p.value, file = "Wilcoxon_results_all_V_ctpos.txt", append = TRUE)
+  write("", file = "Wilcoxon_results_all_V_ctpos.txt", append = TRUE)
+  if (results$p.value < 0.05) {
+    write(path, file = "V_pos_significantly_greater_than_neg.txt", append = TRUE)
+    write(paste("Mean of negative V samples:", mean(negV), sep = " "), file = "V_pos_significantly_greater_than_neg.txt", append = TRUE)
+  write(paste("Mean of positive V samples:", mean(posV), sep = " "), file = "V_pos_significantly_greater_than_neg.txt", append = TRUE)
+    write(results$method, file = "V_pos_significantly_greater_than_neg.txt", append = TRUE)
+    write(results$p.value, file = "V_pos_significantly_greater_than_neg.txt", append = TRUE)
+    write("", file = "V_pos_significantly_greater_than_neg.txt", append = TRUE)
+  }
+  
+  results <- wilcox.test(posC, negC, exact=FALSE, alternative="greater")
+  write(results$method, file = "Wilcoxon_results_all_C_ctpos.txt", append = TRUE)
+  write(results$p.value, file = "Wilcoxon_results_all_C_ctpos.txt", append = TRUE)
+  write("", file = "Wilcoxon_results_all_C_ctpos.txt", append = TRUE)
+  if (results$p.value < 0.05) {
+    write(path, file = "C_pos_significantly_greater_than_neg.txt", append = TRUE)
+    write(paste("Mean of negative C samples:", mean(negC), sep = " "), file = "C_pos_significantly_greater_than_neg.txt", append = TRUE)
+  write(paste("Mean of positive C samples:", mean(posC), sep = " "), file = "C_pos_significantly_greater_than_neg.txt", append = TRUE)
+    write(results$method, file = "C_pos_significantly_greater_than_neg.txt", append = TRUE)
+    write(results$p.value, file = "C_pos_significantly_greater_than_neg.txt", append = TRUE)
+    write("", file = "C_pos_significantly_greater_than_neg.txt", append = TRUE)
+  }
+  
+  results <- wilcox.test(posR, negR, exact=FALSE, alternative="greater")
+  write(results$method, file = "Wilcoxon_results_all_R_ctpos.txt", append = TRUE)
+  write(results$p.value, file = "Wilcoxon_results_all_R_ctpos.txt", append = TRUE)
+  write("", file = "Wilcoxon_results_all_R_ctpos.txt", append = TRUE)
+  if (results$p.value < 0.05) {
+    write(path, file = "R_pos_significantly_greater_than_neg.txt", append = TRUE)
+    write(paste("Mean of negative R samples:", mean(negR), sep = " "), file = "R_pos_significantly_greater_than_neg.txt", append = TRUE)
+  write(paste("Mean of positive R samples:", mean(posR), sep = " "), file = "R_pos_significantly_greater_than_neg.txt", append = TRUE)
+    write(results$method, file = "R_pos_significantly_greater_than_neg.txt", append = TRUE)
+    write(results$p.value, file = "R_pos_significantly_greater_than_neg.txt", append = TRUE)
+    write("", file = "R_pos_significantly_greater_than_neg.txt", append = TRUE)
+  }
+  
+}
+```
